@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 from psycopg2 import Error, pool
+import json
 
 
 # load from .env
@@ -119,7 +120,7 @@ def chat(req: func.HttpRequest) -> func.HttpResponse:
         results = []
         # Print all rows
         for row in rows:
-            results.append("Data row = (%s, %s)" %(str(row[0]), str(row[1])))
+            results.append("Data row = (%s, %s)" % (str(row[0]), str(row[1])))
             
     except Exception as e:
         return func.HttpResponse(
@@ -129,7 +130,7 @@ def chat(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     return func.HttpResponse(
-        f'{{"response": "{str(results)}", "status_code": 200}}',
+        f'{{"response": {json.dumps(results)}, "status_code": 200}}',
         status_code=200,
         mimetype="application/json"
     )

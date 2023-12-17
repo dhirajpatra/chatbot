@@ -34,17 +34,20 @@ function appendMessage(sender, message, isUser = false) {
         var table = document.createElement("table");
         table.className = "response-table";
 
-        // Add headers
-        var headerRow = table.insertRow(0);
-        for (var i = 0; i < message.length; i++) {
-            var headerCell = headerRow.insertCell(i);
-            headerCell.innerHTML = `<strong>${message[i]}</strong>`;
-        }
+        // // Split the first element to get headers
+        // var headers = message[0].split("\t");
+
+        // // Add headers
+        // var headerRow = table.insertRow(0);
+        // for (var i = 0; i < headers.length; i++) {
+        //     var headerCell = headerRow.insertCell(i);
+        //     headerCell.innerHTML = `<strong>${headers[i]}</strong>`;
+        // }
 
         // Add data rows
-        for (var i = 1; i < message.length; i++) {
+        for (var i = 0; i < message.length; i++) {
             var dataRow = table.insertRow(i);
-            var rowData = message[i].replace("Data row = ", "").replace("(", "").replace(")", "").split(", ");
+            var rowData = message[i].split("\t");
             for (var j = 0; j < rowData.length; j++) {
                 var dataCell = dataRow.insertCell(j);
                 dataCell.innerHTML = rowData[j];
