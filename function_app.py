@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import psycopg2
 from psycopg2 import Error, pool
 import json
+# from openai import run_conversation, get_current_weather
 
 
 # load from .env
@@ -102,6 +103,9 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="chat")
 def chat(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python Chat function processed a request.')
+    
+    # call openai api
+    # run_conversation()
     
     # get the cosmosDB connected
     try:
