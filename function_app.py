@@ -24,9 +24,11 @@ def get_connection():
         return postgreSQL_pool, conn, cursor
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Database connection failed.",
-             status_code=200
+            '{"response": "This HTTP triggered function executed successfully. Database connection  success.", "status_code": 200}',
+            status_code=200,
+            mimetype="application/json"
         )
+
 
 # this will test the connection to cosmosdb pgsql
 def db_transaction(conn, cursor):
@@ -63,8 +65,9 @@ def db_transaction(conn, cursor):
     
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Database transaction failed.",
-             status_code=200
+            '{"response": "This HTTP triggered function executed successfully. Database transaction failed.", "status_code": 200}',
+            status_code=200,
+            mimetype="application/json"
         )
 
 
@@ -74,29 +77,6 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 @app.route(route="http_trigger")
 def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
-    
-    # get the cosmosDB connected
-    try:
-        postgreSQL_pool, conn, cursor = get_connection()
-    except Exception as e:
-        return func.HttpResponse(
-             f"This HTTP triggered function executed successfully. Database connection failed. {e}",
-             status_code=200
-        )
-        
-    # cosmosdb transaction testing
-    try:
-        rows = db_transaction(conn, cursor)
-        results = []
-        # Print all rows
-        for row in rows:
-            results.append("Data row = (%s, %s)" %(str(row[0]), str(row[1])))
-            
-    except Exception as e:
-        return func.HttpResponse(
-             f"This HTTP triggered function executed successfully. Database transaction failed. {e}",
-             status_code=200
-        )
 
     name = req.params.get('name')
     if not name:
@@ -111,6 +91,45 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
     else:
         return func.HttpResponse(
-             f"This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response. Database also connected successfully. {conn_string} \n and Results from cosmosDB\n {str(results)}",
-             status_code=200
+            '{"response": "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.", "status_code": 200}',
+            status_code=200,
+            mimetype="application/json"
         )
+        
+        
+# test the connection to cosmosdb pgsql        
+@app.route(route="chat")
+def chat(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python Chat function processed a request.')
+    
+    # get the cosmosDB connected
+    try:
+        postgreSQL_pool, conn, cursor = get_connection()
+    except Exception as e:
+        return func.HttpResponse(
+            f'{{"response": "This HTTP triggered function executed successfully. Database connection failed. {e}", "status_code": 200}}',
+            status_code=200,
+            mimetype="application/json"
+        )
+
+        
+    # cosmosdb transaction testing
+    try:
+        rows = db_transaction(conn, cursor)
+        results = []
+        # Print all rows
+        for row in rows:
+            results.append("Data row = (%s, %s)" %(str(row[0]), str(row[1])))
+            
+    except Exception as e:
+        return func.HttpResponse(
+            f'{{"response": "This HTTP triggered function executed successfully. Database transaction failed. {e}", "status_code": 200}}',
+            status_code=200,
+            mimetype="application/json"
+        )
+
+    return func.HttpResponse(
+        f'{{"response": "{str(results)}", "status_code": 200}}',
+        status_code=200,
+        mimetype="application/json"
+    )
